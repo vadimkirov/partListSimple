@@ -108,7 +108,7 @@ public class MainController {
     @GetMapping("/norequared")
     public String getNoRequared(@RequestParam(required = false, defaultValue = "") String filter,
                                 Model model,
-                                @PageableDefault(sort = {"id"}, direction = Sort.Direction.ASC)
+                                @PageableDefault(sort = {"title"}, direction = Sort.Direction.ASC)
                                         Pageable pageable){
 
         Page<PartModel> page = repository.findByRequired(false,pageable);
