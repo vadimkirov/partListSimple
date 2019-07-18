@@ -3,6 +3,7 @@ package com.example.partlist.controller;
 
 import com.example.partlist.model.PartModel;
 import com.example.partlist.repository.MainRepository;
+import com.example.partlist.service.PartService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,11 +19,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Controller
 public class MainController {
 
+    private final PartService service;
+
     private final MainRepository repository;
 
     @Autowired
-    public MainController(MainRepository repository) {
+    public MainController(MainRepository repository, PartService service) {
         this.repository = repository;
+        this.service = service;
     }
 
     @GetMapping("/")
@@ -43,7 +47,7 @@ public class MainController {
                              Model model, @PageableDefault(sort = {"title"}, direction = Sort.Direction.ASC)
                                      Pageable pageable) {
         Page<PartModel> page = getPartList(filter, pageable) ;
-        model.addAttribute("sumComps",computersForAssembly());
+        model.addAttribute("sumComps",service.computersForAssembly());
         model.addAttribute("url", "/main");
         model.addAttribute("page", page);
         model.addAttribute("filter",filter);
@@ -75,11 +79,11 @@ public class MainController {
     public String update(@RequestParam("partId") PartModel updated,
                          @RequestParam("partTitle") String title,
                          @RequestParam("partQuantity") Integer quantity,
-                         @RequestParam(value = "partRequared", defaultValue = "") String requared){
-        Boolean i_requared = requared.equals("on");
+                         @RequestParam(value = "partRequired", defaultValue = "") String required){
+        Boolean i_required = required.equals("on");
         updated.setTitle(title);
         updated.setQuantity(quantity);
-        updated.setRequired(i_requared);
+        updated.setRequired(i_required);
         repository.save(updated);
         return "redirect:/main";
     }
@@ -97,7 +101,7 @@ public class MainController {
                                       Pageable pageable){
 
         Page<PartModel> page = repository.findByRequired(true,pageable);
-        model.addAttribute("sumComps",computersForAssembly());
+        model.addAttribute("sumComps",service.computersForAssembly());
         model.addAttribute("url","/requared");
         model.addAttribute("page", page);
         model.addAttribute("filter",filter);
@@ -112,7 +116,7 @@ public class MainController {
                                         Pageable pageable){
 
         Page<PartModel> page = repository.findByRequired(false,pageable);
-        model.addAttribute("sumComps",computersForAssembly());
+        model.addAttribute("sumComps",service.computersForAssembly());
         model.addAttribute("url","/norequared");
         model.addAttribute("page", page);
         model.addAttribute("filter",filter);
@@ -132,18 +136,4 @@ public class MainController {
         return parts;
     }
 
-
-
-    private int computersForAssembly() {
-        if(repository.findByRequiredIsTrue().size() == 0){
-            return 0;
-        }
-        int quantity = repository.findByRequiredIsTrue().get(0).getQuantity();
-        for  (PartModel item: repository.findByRequiredIsTrue()){
-            if(item.getQuantity()< quantity){
-                quantity = item.getQuantity();
-            }
-        }
-        return quantity;
-    }
 }

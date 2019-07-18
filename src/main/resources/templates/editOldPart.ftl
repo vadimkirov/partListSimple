@@ -8,13 +8,19 @@
                 <input type="hidden" value="${part.id}" name="partId">
             </tr>
             <tr>
-                Название <input type="text" value="${part.title}" name="partTitle">
+                Название <label>
+                    <input type="text" value="${part.title}" name="partTitle">
+                </label>
             </tr>
             <tr>
-                Количество <input type="number" value="${part.quantity}" name="partQuantity">
+                Количество <label>
+                    <input type="number" value="${part.quantity}" name="partQuantity">
+                </label>
             </tr>
             <tr>
-                Деталь необходима для сборки?<input type="checkbox"   name="partRequared">
+                Деталь необходима для сборки?<label>
+                    <input type="checkbox"   name="partRequired">
+                </label>
             </tr>
             </tbody>
 
